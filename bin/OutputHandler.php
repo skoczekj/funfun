@@ -22,6 +22,8 @@ class OutputHandler
 
     public function showPassedArguments(string $url, int $limit)
     {
+        $this->lineBreak();
+
         fprintf(
             STDERR,
             "url to crawl is: $url\n" . 
@@ -41,7 +43,12 @@ class OutputHandler
     {
         fprintf(
             STDERR,
-            "found " . sizeof($subpages) . " unique subpages"
+            "found " . sizeof($subpages) . " unique subpages\n"
         );
+    }
+
+    public function done()
+    {
+        fprintf(STDERR, "\ndone!\n");
     }
 }

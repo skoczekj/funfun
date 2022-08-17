@@ -8,16 +8,14 @@ class InputHandler
 
     private $opts;
     private $outputHandler;
-    private $service;
 
-    public function __construct(array $opts, OutputHandler $outputHandler, Service $service)
+    public function __construct(array $opts, OutputHandler $outputHandler)
     {
         $this->opts = $opts;
         $this->outputHandler = $outputHandler;
-        $this->service = $service;
     }
 
-    public function crawl()
+    public function getInputArguments()
     {
         if (isset($this->opts["h"])) {
             $this->outputHandler->showHelp();
@@ -37,6 +35,10 @@ class InputHandler
             $url = $this->opts["u"];
         }
 
-        $this->service->crawl($url, $limit);
+        //TODO tranfer class for this
+        return [
+            "url" => $url,
+            "limit" => $limit
+        ];
     }
 }

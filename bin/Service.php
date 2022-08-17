@@ -6,25 +6,35 @@ class Service
 {
     const CRAWLED_HTML_DIR = 'bin/html/';
 
-    private $outputHandler;
+    private OutputHandler $outputHandler;
+    private string $url;
+    private int $limit;
+    private string $baseUrl;
+    private string $basePageName;
 
-    public function __construct(OutputHandler $outputHandler)
+    public function __construct(OutputHandler $outputHandler, array $inputArguments)
     {
         $this->outputHandler = $outputHandler;
+        $this->url = $inputArguments["url"];
+        $this->limit = $inputArguments["limit"];
+
+        $this->getBaseUrl();
+        $this->getBasePageName();
     }
 
-    public function crawl(string $url, int $limit)
+    public function crawl()
     {
         $this->clearSavedHtml();
 
-        $this->outputHandler->showPassedArguments($url, $limit);
+        $this->outputHandler->showPassedArguments($this->url, $this->limit);
+        
+        $html = file_get_contents($this->url);
+        $this->saveFile($this->basePageName, $html);
 
-        $baseUrl = $this->getBaseUrl($url);
-        $html = file_get_contents($url);
-        $this->saveFile($this->getBasePageName($url), $html);
+        $subpages = $this->regexGetSubpages($html, $this->limit);
+        $this->crawlSubpages($subpages);
 
-        $subpages = $this->regexGetSubpages($html, $limit);
-        $this->crawlSubpages($subpages, $baseUrl);
+        $this->outputHandler->done();
     }
 
     public function clearSavedHtml()
@@ -59,16 +69,16 @@ class Service
         return $subpages;
     }
 
-    private function getBaseUrl(string $url)
+    private function getBaseUrl()
     {
-        $a = explode('/', $url);
-        return $a[0] . "//" . $a[2];
+        $tmp = explode('/', $this->url);
+        $this->baseUrl = $tmp[0] . "//" . $tmp[2];
     }
 
-    private function getBasePageName(string $url)
+    private function getBasePageName()
     {
-        $a = explode('/', $url);
-        return $a[2];
+        $tmp = explode('/', $this->url);
+        $this->basePageName = $tmp[2];
     }
 
     public function saveFile(string $fileName, string $html)
@@ -78,15 +88,13 @@ class Service
         fclose($file);
     }
 
-    public function crawlSubpages(array $subpages, string $baseUrl)
+    public function crawlSubpages(array $subpages)
     {
         $i=0;
         foreach($subpages as $subpage) {
-            $subpageUrl = $baseUrl . $subpage;
+            $subpageUrl = $this->baseUrl . $subpage;
             $html = file_get_contents($subpageUrl);
-            $this->saveFile($this->getBasePageName($baseUrl) . $i, $html);
-
-            echo "\n" . $subpageUrl . "\n";
+            $this->saveFile($this->basePageName . $i, $html);
             $i++;
         }
     }

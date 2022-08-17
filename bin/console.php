@@ -1,23 +1,16 @@
 <?php
 namespace Root\Www;
 
-use DiDom\Document;
 require_once(__DIR__ . '/../vendor/autoload.php');
 
 $shortOpts = "hu:l::";
 $longOpts = ["help", "url", "limit"];
 
-$opts = getopt($shortOpts);
-
 $outputHandler = new OutputHandler();
-$service = new Service($outputHandler);
-$inputHandler = new InputHandler($opts, $outputHandler, $service);
-$inputHandler->crawl();
+$inputHandler = new InputHandler(getopt($shortOpts), $outputHandler);
+$inputArguments = $inputHandler->getInputArguments();
 
-
-
-// crawl($url, $limit);
-
-// lineBreak();
+$service = new Service($outputHandler, $inputArguments);
+$service->crawl();
 
 exit;
