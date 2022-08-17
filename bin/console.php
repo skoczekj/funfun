@@ -1,35 +1,23 @@
 <?php
-include "output.php";
-include "service.php";
+namespace Root\Www;
 
-lineBreak();
+use DiDom\Document;
+require_once(__DIR__ . '/../vendor/autoload.php');
 
 $shortOpts = "hu:l::";
 $longOpts = ["help", "url", "limit"];
 
 $opts = getopt($shortOpts);
 
-if (isset($opts["h"])) {
-    showHelp();
-}
+$outputHandler = new OutputHandler();
+$service = new Service($outputHandler);
+$inputHandler = new InputHandler($opts, $outputHandler, $service);
+$inputHandler->crawl();
 
-$limit = 100;
-if (
-    isset($opts["l"]) &&
-    $opts["l"] < 100 &&
-    $opts["l"] > 0
-) {
-    $limit = (int)$opts["l"];
-}
 
-$url = "";
-if (isset($opts["u"])) {
-    //TODO SANITIZE INPUT
-    $url = $opts["u"];
-}
 
-crawl($url, $limit);
+// crawl($url, $limit);
 
-lineBreak();
+// lineBreak();
 
 exit;
