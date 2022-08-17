@@ -5,34 +5,43 @@ require_once('vendor/autoload.php');
 
 function crawl(string $url, int $limit)
 {
+    clearSavedHtml();
+
     showPassedArguments($url, $limit);
+
     $baseUrl = (getBaseUrl($url));
     $html = file_get_contents($url);
-
-
     saveFile(getBasePageName($url), $html);
 
-
     $subpages = regexGetSubpages($html, $limit);
+    crawlSubpages($subpages, $baseUrl);
+}
+
+function clearSavedHtml()
+{
+    //TODO move path to var
+    $files = glob('bin/html/*');
+    foreach($files as $file){
+        if(is_file($file)) {
+            unlink($file);
+        }
+    }
 }
 
 function regexGetSubpages(string $html, int $limit): array
 {
+    //todo if not enough pages then try and get more urls from subpages
     $regexPattern = '/<a\s+(?:[^>]*?\s+)?href=(["\'])(.*?)\1/';
     preg_match_all($regexPattern, $html, $out, PREG_SET_ORDER);
 
     $i=0;
     $subpages = [];
-    while($i < $limit && isset($out[$i])) {
+    while(sizeof($subpages) < $limit && isset($out[$i])) {
         array_push($subpages, $out[$i][2]);
         $subpages = array_unique($subpages, SORT_REGULAR);
 
-        //TODO what to do when array is not unique add var that increses with each duplicate ?
-                // if(sizeof($tmp) !== $i + 1) {
-        //     $limit++;
-        // } else {
-        //     $i++;
-        // }
+        //TODO links to pictures ?
+
         $i++;
     }
 
@@ -43,14 +52,12 @@ function regexGetSubpages(string $html, int $limit): array
 
 function getBaseUrl(string $url)
 {
-    //TODO remove ditry hack to get base url
     $a = explode('/', $url);
     return $a[0] . "//" . $a[2];
 }
 
 function getBasePageName(string $url)
 {
-    //TODO remove ditry hack to get base url
     $a = explode('/', $url);
     return $a[2];
 }
@@ -62,43 +69,15 @@ function saveFile(string $fileName, string $html)
     fclose($file);
 }
 
+function crawlSubpages(array $subpages, string $baseUrl)
+{
+    $i=0;
+    foreach($subpages as $subpage) {
+        $subpageUrl = $baseUrl . $subpage;
+        $html = file_get_contents($subpageUrl);
+        saveFile(getBasePageName($baseUrl) . $i, $html);
 
-
-
-
-
-
-
-
-
-
-
-// //todo private?
-// function getDocument(string $url): Document
-// {
-//     $document = new Document($url, true);
-
-//     //todo meh
-//     if ($document->has('a')) {
-//         $elements = $document->find('');
-//         foreach ($elements as $element) {
-//             echo $element->text();
-//             echo "\n";
-//         }
-//     } else {
-//         noFileError('asd');
-//     }
-//     return $document;
-// }
-
-// function getUrls(Document $dom)
-// {
-//     //todo get links, put to array, make sure none are duped, return
-//     $head = $dom->getElementsByTagName('head')->item(0);
-//     $links = $head->getElementsByTagName("link");
-//     foreach($links as $l) {
-//         if($l->getAttribute("rel") == "service") {
-//             echo $l->getAttribute("href");
-//         }
-//     }
-// }
+        echo "\n" . $subpageUrl . "\n";
+        $i++;
+    }
+}
