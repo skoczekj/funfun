@@ -6,9 +6,14 @@ require_once('vendor/autoload.php');
 function crawl(string $url, int $limit)
 {
     showPassedArguments($url, $limit);
-    $html = file_get_contents($url);
-    $subpages = regexGetSubpages($html, $limit);
     $baseUrl = (getBaseUrl($url));
+    $html = file_get_contents($url);
+
+
+    saveFile(getBasePageName($url), $html);
+
+
+    $subpages = regexGetSubpages($html, $limit);
 }
 
 function regexGetSubpages(string $html, int $limit): array
@@ -41,6 +46,20 @@ function getBaseUrl(string $url)
     //TODO remove ditry hack to get base url
     $a = explode('/', $url);
     return $a[0] . "//" . $a[2];
+}
+
+function getBasePageName(string $url)
+{
+    //TODO remove ditry hack to get base url
+    $a = explode('/', $url);
+    return $a[2];
+}
+
+function saveFile(string $fileName, string $html)
+{
+    $file = fopen("bin/html/" . $fileName . ".html", "w");
+    fwrite($file, $html);
+    fclose($file);
 }
 
 
