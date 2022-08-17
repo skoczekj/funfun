@@ -15,7 +15,7 @@ class InputHandler
         $this->outputHandler = $outputHandler;
     }
 
-    public function getInputArguments()
+    public function getInputArguments(): OptsTransferObject
     {
         if (isset($this->opts["h"])) {
             $this->outputHandler->showHelp();
@@ -35,10 +35,6 @@ class InputHandler
             $url = $this->opts["u"];
         }
 
-        //TODO tranfer class for this
-        return [
-            "url" => $url,
-            "limit" => $limit
-        ];
+        return new OptsTransferObject($url, $limit);
     }
 }

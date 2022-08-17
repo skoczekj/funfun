@@ -12,11 +12,13 @@ class Service
     private string $baseUrl;
     private string $basePageName;
 
-    public function __construct(OutputHandler $outputHandler, array $inputArguments)
+    public function __construct(OutputHandler $outputHandler, OptsTransferObject $optsTransferObject)
     {
         $this->outputHandler = $outputHandler;
-        $this->url = $inputArguments["url"];
-        $this->limit = $inputArguments["limit"];
+        $this->url = $optsTransferObject->url;
+        $this->limit = $optsTransferObject->limit;
+
+        $this->clearSavedHtml();
 
         $this->getBaseUrl();
         $this->getBasePageName();
@@ -24,8 +26,6 @@ class Service
 
     public function crawl()
     {
-        $this->clearSavedHtml();
-
         $this->outputHandler->showPassedArguments($this->url, $this->limit);
         
         $html = file_get_contents($this->url);
@@ -37,7 +37,7 @@ class Service
         $this->outputHandler->done();
     }
 
-    public function clearSavedHtml()
+    private function clearSavedHtml()
     {
         $files = glob(self::CRAWLED_HTML_DIR . '*');
         foreach($files as $file){
@@ -47,7 +47,7 @@ class Service
         }
     }
 
-    public function regexGetSubpages(string $html, int $limit): array
+    private function regexGetSubpages(string $html, int $limit): array
     {
         //todo if not enough pages then try and get more urls from subpages
         $regexPattern = '/<a\s+(?:[^>]*?\s+)?href=(["\'])(.*?)\1/';
