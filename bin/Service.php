@@ -1,4 +1,4 @@
-<?
+<?php
 
 namespace Root\Www;
 
@@ -24,10 +24,10 @@ class Service
         $this->getBasePageName();
     }
 
-    public function crawl()
+    public function crawl(): void
     {
         $this->outputHandler->showPassedArguments($this->url, $this->limit);
-        
+
         $html = file_get_contents($this->url);
         $this->saveFile($this->basePageName, $html);
 
@@ -37,11 +37,11 @@ class Service
         $this->outputHandler->done();
     }
 
-    private function clearSavedHtml()
+    private function clearSavedHtml(): void
     {
         $files = glob(self::CRAWLED_HTML_DIR . '*');
-        foreach($files as $file){
-            if(is_file($file)) {
+        foreach ($files as $file) {
+            if (is_file($file)) {
                 unlink($file);
             }
         }
@@ -53,9 +53,9 @@ class Service
         $regexPattern = '/<a\s+(?:[^>]*?\s+)?href=(["\'])(.*?)\1/';
         preg_match_all($regexPattern, $html, $out, PREG_SET_ORDER);
 
-        $i=0;
+        $i = 0;
         $subpages = [];
-        while(sizeof($subpages) < $limit && isset($out[$i])) {
+        while (sizeof($subpages) < $limit && isset($out[$i])) {
             array_push($subpages, $out[$i][2]);
             $subpages = array_unique($subpages, SORT_REGULAR);
 
@@ -90,13 +90,12 @@ class Service
 
     public function crawlSubpages(array $subpages)
     {
-        $i=0;
-        foreach($subpages as $subpage) {
+        $i = 0;
+        foreach ($subpages as $subpage) {
             $subpageUrl = $this->baseUrl . $subpage;
             $html = file_get_contents($subpageUrl);
             $this->saveFile($this->basePageName . $i, $html);
             $i++;
         }
     }
-
 }

@@ -1,4 +1,4 @@
-<?
+<?php
 
 namespace Root\Www;
 
@@ -20,7 +20,7 @@ class InputHandler
         if (isset($this->opts["h"])) {
             $this->outputHandler->showHelp();
         }
-        
+
         if (
             isset($this->opts["l"]) &&
             $this->opts["l"] < self::PAGE_LIMIT &&
@@ -28,7 +28,7 @@ class InputHandler
         ) {
             $limit = (int)$this->opts["l"];
         }
-        
+
         $url = "";
         if (isset($this->opts["u"])) {
             //TODO SANITIZE INPUT

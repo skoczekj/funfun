@@ -1,4 +1,4 @@
-<?
+<?php
 
 namespace Root\Www;
 
