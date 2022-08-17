@@ -1,5 +1,6 @@
 <?php
 include "output.php";
+include "service.php";
 
 lineBreak();
 
@@ -18,14 +19,17 @@ if (
     $opts["l"] < 100 &&
     $opts["l"] > 0
 ) {
-    $limit = $opts["l"];
+    $limit = (int)$opts["l"];
 }
 
 $url = "";
 if (isset($opts["u"])) {
+    //TODO SANITIZE INPUT
     $url = $opts["u"];
 }
 
-showPassedArguments($url, $limit);
+crawl($url, $limit);
+
+lineBreak();
 
 exit;

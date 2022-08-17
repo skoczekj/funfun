@@ -5,7 +5,8 @@ function lineBreak()
     fprintf(STDERR, "\n");
 }
 
-function showHelp() {
+function showHelp()
+{
     fprintf(
         STDERR,
         "Here is some help!\n\n" . 
@@ -24,17 +25,18 @@ function showPassedArguments(string $url, int $limit)
     );
 }
 
-
-if (isset($opts["l"])) {
+function noFileError(string $url)
+{
     fprintf(
         STDERR,
-        "max urls limit is: $limit\n\n"
+        "can not access: $url\n"
     );
 }
 
-if (isset($opts["u"])) {
+function showNumberOfUniqueSubpages(array $subpages)
+{
     fprintf(
         STDERR,
-        "url to crawl is: $url\n\n"
+        "found " . sizeof($subpages) . " unique subpages"
     );
 }
